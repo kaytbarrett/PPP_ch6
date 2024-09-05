@@ -75,8 +75,8 @@ Token Token_stream::get()
     cin >> ch;    // note that >> skips whitespace (space, newline, tab, etc.)
 
     switch (ch) {
-    case '=':    // for "print"
-    case 'x':    // for "quit"
+    case ';':    // for "print"
+    case 'q':    // for "quit"
     case '(': case ')': case '+': case '-': case '*': case '/': case '{': case '}': case '!':
         return Token(ch);        // let each character represent itself
     case '.':
@@ -214,16 +214,17 @@ try
     "\nPlease enter expressions using floating-point numbers.\n" <<
     "For this program, you can use (), +, -, *, and /.\n" <<
     "To end the expression you want to calculate, end with an = sign.\n" <<
-    "For example: (2+3)*11=\n\n" <<
-    "To exit, please enter x.\n\n";
+    "For example: (2+3)*11;\n\n" <<
+    "To exit, please enter q.\n\n";
 
     double val = 0;
     while (cin) {
+        cout << ">";
         Token t = ts.get();
         
-        if (t.kind == 'x') 
+        if (t.kind == 'q') 
             break; // 'q' for quit
-        if (t.kind == '='){       // ';' for "print now"
+        if (t.kind == ';'){       // ';' for "print now"
             cout << "=" << val << '\n';
         } else {
             ts.putback(t);
