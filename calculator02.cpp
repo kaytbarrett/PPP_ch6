@@ -217,20 +217,19 @@ try
     "For example: (2+3)*11;\n\n" <<
     "To exit, please enter q.\n\n";
 
-    double val = 0;
     while (cin) {
         cout << ">";
         Token t = ts.get();
-        
+
+        while (t.kind == ';')
+            t = ts.get();
         if (t.kind == 'q') 
-            break; // 'q' for quit
-        if (t.kind == ';'){       // ';' for "print now"
-            cout << "=" << val << '\n';
-        } else {
-            ts.putback(t);
-            val = expression();
-        }
+            return 0; // 'q' for quit
+
+        ts.putback(t);
+        cout << "=" << expression() << endl;
     }
+    return 0;
 }
 catch (exception& e) {
     cerr << "error: " << e.what() << '\n';
