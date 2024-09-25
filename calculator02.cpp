@@ -260,9 +260,21 @@ double expression()
 
 //------------------------------------------------------------------------------
 
+void clean_up_mess()
+{
+    while(true){
+        Token t = ts.get();
+        if (t.kind == print)
+            return;
+    }
+}
+
+//------------------------------------------------------------------------------
+
 void calculate()
 {
-    while (cin) {
+    while (cin) 
+    try {
         cout << prompt;
         Token t = ts.get();
 
@@ -273,9 +285,15 @@ void calculate()
 
         ts.putback(t);
         cout << result << expression() << endl;
+    } catch(exception& e) {
+        cerr << e.what() << '/n';
+        clean_up_mess();
     }
 
 }
+
+//------------------------------------------------------------------------------
+
 
 int main()
 try
