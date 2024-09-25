@@ -5,15 +5,34 @@
 //
 
 /*
-    This file is known as calculator02buggy.cpp
+    This program implements a basic expression calculator.
+    Input from cin, output to cout.
+    The grammar for input is:
 
-    I have inserted 5 errors that should cause this not to compile
-    I have inserted 3 logic errors that should cause the program to give wrong results
-
-    First try to find an remove the bugs without looking in the book.
-    If that gets tedious, compare the code to that in the book (or posted source code)
-
-    Happy hunting!
+    Statement: 
+        Expression
+        Print
+        Quit
+    Print: 
+        ";"
+    Quit:
+        "q"
+    Expression:
+        Term
+        Expression "+" Term
+        Expression "-" Term
+    Term:
+        Primary
+        Term "*" Primary
+        Term "/" Primary
+        Term "%" Primary
+    Primary:
+        Number
+        "(" Expression ")"
+        "-" Primary
+        "+" Primary
+    Number:
+        Floating-point-literal
 
 */
 
@@ -23,13 +42,26 @@
 
 class Token{
 public:
+
+    static constexpr char number = '8'; // Define the constant at the top
+
     char kind;        // what kind of token
     double value;     // for numbers: a value 
-    Token(char ch)    // make a Token from a char
+
+    // Constructor to create a Token from a char
+    Token(char ch)    
         :kind(ch), value(0) { }
-    Token(char ch, double val)     // make a Token from a char and a double
+
+    // Constructor to create a Token from a char and a double
+    Token(char ch, double val)     
         :kind(ch), value(val) { }
 };
+
+constexpr char quit = 'q';
+constexpr char print = ';';
+constexpr char prompt = '>';
+constexpr char result = '=';
+
 
 //------------------------------------------------------------------------------
 
@@ -75,18 +107,27 @@ Token Token_stream::get()
     cin >> ch;    // note that >> skips whitespace (space, newline, tab, etc.)
 
     switch (ch) {
-    case ';':    // for "print"
-    case 'q':    // for "quit"
-    case '(': case ')': case '+': case '-': case '*': case '/': case '{': case '}': case '!': case '%':
+    case print:    
+    case quit:    
+    case '(': 
+    case ')': 
+    case '+': 
+    case '-': 
+    case '*': 
+    case '/': 
+    case '{': 
+    case '}': 
+    case '!': 
+    case '%':
         return Token(ch);        // let each character represent itself
-    case '.':
+    case '.':                    // a floating point literal can start with a .
     case '0': case '1': case '2': case '3': case '4':
     case '5': case '6': case '7': case '8': case '9':
     {
         cin.putback(ch);         // put digit back into the input stream
         double val;
         cin >> val;              // read a floating-point number
-        return Token('8', val);   // let '8' represent "a number"
+        return Token(Token::number, val);   
     }
     default:
         error("Bad token");
@@ -122,7 +163,7 @@ double primary()
         if (t.kind != '}') error("'}' expected");
         return d;
     }
-    case '8':            // we use '8' to represent a number
+    case Token::number:            
     {
         int left = t.value;
         t = ts.get();
@@ -219,6 +260,23 @@ double expression()
 
 //------------------------------------------------------------------------------
 
+void calculate()
+{
+    while (cin) {
+        cout << prompt;
+        Token t = ts.get();
+
+        while (t.kind == print)
+            t = ts.get();
+        if (t.kind == quit ) 
+            return;
+
+        ts.putback(t);
+        cout << result << expression() << endl;
+    }
+
+}
+
 int main()
 try
 {
@@ -229,19 +287,9 @@ try
     "For example: (2+3)*11;\n\n" <<
     "To exit, please enter q.\n\n";
 
-    while (cin) {
-        cout << ">";
-        Token t = ts.get();
-
-        while (t.kind == ';')
-            t = ts.get();
-        if (t.kind == 'q') 
-            return 0; // 'q' for quit
-
-        ts.putback(t);
-        cout << "=" << expression() << endl;
-    }
+    calculate();
     return 0;
+
 }
 catch (exception& e) {
     cerr << "error: " << e.what() << '\n';
