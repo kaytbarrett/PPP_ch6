@@ -70,6 +70,7 @@ public:
     Token_stream();   // make a Token_stream that reads from cin
     Token get();      // get a Token (get() is defined elsewhere)
     void putback(Token t);    // put a Token back
+    void ignore(char c);
 private:
     bool full;        // is there a Token in the buffer?
     Token buffer;     // here is where we keep a Token put back using putback()
@@ -84,6 +85,27 @@ Token_stream::Token_stream()
 }
 
 //------------------------------------------------------------------------------
+
+// The ignore() member function looks at the token_stream's buffer to ignore unwanted characters:
+void Token_stream::ignore(char c) // c represents the kind of Token
+{
+    if(full && c==buffer.kind){
+        full = false;
+        return;
+    }
+    full = false;
+
+    // now search input:
+    char ch = 0;
+    while(cin>>ch){
+        if(ch==c)
+            return;
+    }
+
+}
+
+//------------------------------------------------------------------------------
+
 
 // The putback() member function puts its argument back into the Token_stream's buffer:
 void Token_stream::putback(Token t)
@@ -262,11 +284,7 @@ double expression()
 
 void clean_up_mess()
 {
-    while(true){
-        Token t = ts.get();
-        if (t.kind == print)
-            return;
-    }
+    ts.ignore(print);
 }
 
 //------------------------------------------------------------------------------
