@@ -34,9 +34,29 @@
     Number:
         Floating-point-literal
 
+
+New Grammar: 
+    Calculation: 
+        Statement
+        Print
+        Quit
+        Calculation Statement
+    Statement:
+        Declaration
+        Expression
+    Declaration:
+        "let" Name "=" Expression
+
 */
 
 #include "std_lib_facilities.h"
+
+//------------------------------------------------------------------------------
+
+constexpr char quit = 'q';
+constexpr char print = ';';
+constexpr char prompt = '>';
+constexpr char result = '=';
 
 //------------------------------------------------------------------------------
 
@@ -56,12 +76,6 @@ public:
     Token(char ch, double val)     
         :kind(ch), value(val) { }
 };
-
-constexpr char quit = 'q';
-constexpr char print = ';';
-constexpr char prompt = '>';
-constexpr char result = '=';
-
 
 //------------------------------------------------------------------------------
 
@@ -159,6 +173,42 @@ Token Token_stream::get()
 //------------------------------------------------------------------------------
 
 Token_stream ts;        // provides get() and putback() 
+
+//------------------------------------------------------------------------------
+
+class Variable{
+public:
+    string name;
+    double value;
+};
+
+//------------------------------------------------------------------------------
+
+vector<Variable> var_table;
+
+//------------------------------------------------------------------------------
+
+double get_value(string s)
+{
+    for (Variable& v: var_table){       // the & after Variable means it is a reference to the value v rather than copy it
+        if (v.name == s)
+            return v.value;
+        error("trying to read undefined variable ", s);
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void set_value(string s, double d)
+{
+    for (Variable& v: var_table){       // the & after Variable means it is a reference to the value v rather than copy it
+        if(v.name == s)
+            v.value = d;
+            return;
+    }
+    error("trying to write undefined variable ", s);
+
+}
 
 //------------------------------------------------------------------------------
 
